@@ -6,7 +6,7 @@ A very easy to use Qt library for Writing and Reading Json Data.
 
 ### Example
 
-Here is an example which should explain the basic use cases:
+Here is an [example](https://github.com/Spiek/jsonobject/blob/master/src/main.cpp) which should explain the basic use cases:
 
 ```c++
 #include <QList>
@@ -39,7 +39,7 @@ int main()
     main.path("this.is.my.path.0") = 12;
 
     // access value
-    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path").integer());
+    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path.0").integer());
 	
 	// copy to other object
     JsonObject second;
@@ -59,7 +59,7 @@ int main()
 
 This example produces the following result:
 ```
-this.is.my.path = 0
+this.is.my.path = 12
 
 Print Result of Main JsonObject:
 {"array": ["Element 1", "Element 2", "Element 3", true], "integer": 12, "null": null, "object": {"Key 1": "Value 1", "Key 2": "Value 2", "key": "value"}, "string": "My String", "this": {"is": {"my": {"path": [12]}}}}
