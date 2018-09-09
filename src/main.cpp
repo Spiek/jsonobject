@@ -1,18 +1,7 @@
 #include <QList>
 #include <QMap>
 #include <QString>
-
 #include "jsonobject.h"
-
-void print(QString text, JsonObject& data)
-{
-    printf("\n");
-    printf(qPrintable(text));
-    printf("\n");
-    printf(qPrintable(data.toJson()));
-    printf("\n");
-    fflush(stdout);
-}
 
 int main()
 {
@@ -39,15 +28,19 @@ int main()
     main.path("this.is.my.path.0") = 12;
 
     // access value
-    qDebug("this.is.my.path = %d", main.path("this.is.my.path").integer());
-
-    // print result
-    print("Main Object:", main);
-
-    // copy to other object
+    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path").integer());
+	
+	// copy to other object
     JsonObject second;
     second["Second"] = main;
-    print("Second Object:", second);
+	
+    // just print results
+    for(int i = 0; i < 2; i++)
+    {
+        printf("Print Result of %s JsonObject:\n%s\n\n",
+                    !i ? "Main" : "Second",
+                    qPrintable((!i ? main : second).toJson()));
+    }
 
     return 0;
 }
