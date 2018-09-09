@@ -7,12 +7,12 @@ JsonObject* JsonObject::parent()
 
 JsonObject& JsonObject::element()
 {
-    return this->element(this->index);
+    return this->element(this->_index);
 }
 
 JsonObject& JsonObject::element(int index)
 {
-    if(index >= this->index) this->index = index + 1;
+    if(index >= this->_index) this->_index = index + 1;
     return this->element(QString::number(index));
 }
 
@@ -47,8 +47,11 @@ QString JsonObject::toJson()
     QString json = this->typeTemplate();
     QString subJson;
 
+    // handle null type
+    if(type == Type::Null) return json;
+
     // handle string type
-    if(type == Type::String || type == Type::Number) {
+    else if(type == Type::String || type == Type::Number) {
         subJson = this->valueToJson();
     }
 
@@ -69,11 +72,14 @@ QString JsonObject::toJson()
 JsonObject::Type JsonObject::type()
 {
     // check value
-    if(!this->value.isNull()) {
-        return value.canConvert<int>() ?
+    if(!this->_value.isNull()) {
+        return _value.canConvert<int>() ?
                     Type::Number :
                     Type::String;
     }
+
+    // if we have no value set in object, we have an null type
+    if(this->objects.isEmpty()) return Type::Null;
 
     // check sub value type
     bool isArray;
@@ -87,21 +93,21 @@ QString JsonObject::typeTemplate()
     switch(this->type()) {
         case Type::Array: return "[%1]";
         case Type::Object: return "{%1}";
-       default : return "%1";
+        case Type::Null: return "null";
+        default : return "%1";
     }
 }
 
-
 QString JsonObject::valueToJson()
 {
-    if(value.type() == QVariant::String) goto string;
-    if(value.type() == QVariant::Bool) {
-        return QString("%1").arg(value.toBool() ? "true" : "false");
+    if(_value.type() == QVariant::String) goto string;
+    if(_value.type() == QVariant::Bool) {
+        return QString("%1").arg(_value.toBool() ? "true" : "false");
     }
-    if(value.canConvert<int>()) {
-        return QString("%1").arg(value.toInt());
+    if(_value.canConvert<int>()) {
+        return QString("%1").arg(_value.toInt());
     }
     string:
-        return QString("\"%1\"").arg(this->value.toString());
+        return QString("\"%1\"").arg(this->_value.toString());
 }
 
