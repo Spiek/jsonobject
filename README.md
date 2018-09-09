@@ -95,4 +95,4 @@ LIBS += -ljsonobject
 ----------
 
 ### Licence
-The [telegrambotlib-qt licence](https://github.com/Spiek/jsonobject/blob/master/LICENCE) is a modified version of the [LGPL](http://www.gnu.org/licenses/lgpl.html) licence, with a static linking exception.
+The [jsonobject licence](https://github.com/Spiek/jsonobject/blob/master/LICENCE) is a modified version of the [LGPL](http://www.gnu.org/licenses/lgpl.html) licence, with a static linking exception.
