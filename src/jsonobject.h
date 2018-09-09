@@ -21,61 +21,31 @@ class JsonObject
             String,
             Number
         };
-        JsonObject() {}
-        JsonObject(QString name, JsonObject* parent) : name(name), parentObject(parent) {}
-        JsonObject* parent()
-        {
-            return this->parentObject;
-        }
 
-        JsonObject& path(QString path)
-        {
-            JsonObject* walk = this;
-            for(QString pathElement : path.split(".")) {
-                bool isInt;
-                int iPathElement = pathElement.toInt(&isInt);
-                if(isInt) {
-                    walk = &walk->element(iPathElement);
-                } else {
-                    walk = &walk->element(pathElement);
-                }
-            }
-            return *walk;
-        }
+        // construct
+        JsonObject(JsonObject *parent = nullptr) : parentObject(parent) {}
 
-        JsonObject& element()
-        {
-            return this->element(this->index);
-        }
+        // element function
+        JsonObject* parent();
+        JsonObject& element();
+        JsonObject& element(int index);
+        JsonObject& element(QString index);
+        JsonObject& path(QString path);
 
-        JsonObject& element(int index)
-        {
-            if(index >= this->index) this->index = index + 1;
-            return this->element(QString::number(index));
-        }
+        // operators
+        inline JsonObject& operator()() { return this->element(this->index); }
+        inline JsonObject& operator()(int index) { return this->element(index); }
+        inline JsonObject& operator()(QString index) { return this->element(index); }
+        inline JsonObject& operator[](int index) { return this->element(index); }
+        inline JsonObject& operator[](QString index) { return this->element(index); }
 
-        JsonObject& element(QString index)
-        {
-            return this->objects.contains(index) ?
-                            this->objects.find(index).value() :
-                            this->objects.insert(index, JsonObject(index, this)).value();
-        }
+        // parsing
+        QString toJson();
 
-        JsonObject& operator()()
-        {
-            return this->element(this->index);
-        }
+        // internal
+        Type type();
 
-        JsonObject& operator()(int index)
-        {
-            return this->element(index);
-        }
-
-        JsonObject& operator()(QString index)
-        {
-            return this->element(index);
-        }
-
+        // templates
         template<typename T>
         JsonObject& operator=(T value)
         {
@@ -84,10 +54,10 @@ class JsonObject
         }
         JsonObject& operator=(QStringList value)
         {
+            // QStringlist will be handled as QList<QString>
             *this = *dynamic_cast<QList<QString>*>(&value);
             return *this;
         }
-
 
         template<typename T>
         JsonObject& operator=(QList<T> value)
@@ -129,77 +99,13 @@ class JsonObject
             return *this;
         }
 
-        QString toJson()
-        {
-            // simplify
-            Type type = this->type();
-
-            // generate base json
-            QString json = this->typeTemplate();
-            QString subJson;
-
-            // handle string type
-            if(type == Type::String || type == Type::Number) {
-                subJson = this->valueToJson();
-            }
-
-            // handle sub elements
-            else {
-                for(auto itr = this->objects.begin(); itr != this->objects.end(); itr++) {
-                    if(itr != this->objects.begin()) subJson += ", ";
-                    if(type == Object) {
-                        subJson += QString("\"%1\": %2").arg(itr.key(), itr.value().toJson());
-                    } else {
-                        subJson += itr.value().toJson();
-                    }
-                }
-            }
-            return json.arg(subJson);
-        }
-
-        Type type()
-        {
-            // check value
-            if(!this->value.isNull()) {
-                return value.canConvert<int>() ?
-                            Type::Number :
-                            Type::String;
-            }
-
-            // check sub value type
-            bool isArray;
-            int lastIndex = this->objects.lastKey().toInt(&isArray);
-            isArray = isArray && this->objects.count() - 1 == lastIndex;
-            return isArray ? Type::Array : Type::Object;
-        }
-
-
     private:
-        QString typeTemplate()
-        {
-            switch(this->type()) {
-                case Type::Array: return "[%1]";
-                case Type::Object: return "{%1}";
-               default : return "%1";
-            }
-        }
+        // helpers
+        QString typeTemplate();
+        QString valueToJson();
 
-
-        QString valueToJson()
-        {
-            if(value.type() == QVariant::String) goto string;
-            if(value.type() == QVariant::Bool) {
-                return QString("%1").arg(value.toBool() ? "true" : "false");
-            }
-            if(value.canConvert<int>()) {
-                return QString("%1").arg(value.toInt());
-            }
-            string:
-                return QString("\"%1\"").arg(this->value.toString());
-        }
-
+        // internal data
         int index = 0;
-        QString name;
         QVariant value;
         QMap<QString, JsonObject> objects;
         JsonObject* parentObject = nullptr;
