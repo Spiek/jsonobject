@@ -43,8 +43,8 @@ class JsonObject
         // element function
         JsonObject* parent();
         JsonObject& element();
-        JsonObject& element(int _index);
-        JsonObject& element(QString _index);
+        JsonObject& element(int index);
+        JsonObject& element(QString index);
         JsonObject& path(QString path);
         inline JsonObject& path(QStringList path) { return this->path(path.join((QChar)'\0')); }
         inline int count() { return this->objects.count(); }
@@ -79,7 +79,9 @@ class JsonObject
         inline int integer(bool* success = nullptr) { return this->value<int>(success); }
         inline QString string(bool* success = nullptr) { return this->value<QString>(success); }
 
-        // templates
+        ///
+        /// operator= Templates
+        ///
         template<typename T>
         JsonObject& operator=(const T& value)
         {
@@ -106,6 +108,7 @@ class JsonObject
             return *this;
         }
 
+        // template
         template<typename T>
         JsonObject& operator=(QList<T> value)
         {
