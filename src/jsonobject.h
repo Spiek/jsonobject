@@ -112,7 +112,43 @@ class JsonObject
         template<typename T>
         JsonObject& operator=(QList<T> value)
         {
+            this->objects.clear();
+            *this += value;
+            return *this;
+        }
+
+        template<typename T>
+        JsonObject& operator=(QSet<T> value)
+        {
+            this->objects.clear();
+            *this += value;
+            return *this;
+        }
+
+        template<typename K, typename T>
+        JsonObject& operator=(QMap<K, T> value)
+        {
+            this->objects.clear();
+            *this += value;
+            return *this;
+        }
+
+        template<typename K, typename T>
+        JsonObject& operator=(QHash<K, T> value)
+        {
+            this->objects.clear();
+            *this += value;
+            return *this;
+        }
+
+        ///
+        /// operator+= Templates
+        ///
+        template<typename T>
+        JsonObject& operator+=(QList<T> value)
+        {
             // add list to elements
+            this->_value.clear();
             for(const T& t : value) {
                 this->element() = qVariantFromValue<T>(t);
             }
@@ -120,9 +156,10 @@ class JsonObject
         }
 
         template<typename T>
-        JsonObject& operator=(QSet<T> value)
+        JsonObject& operator+=(QSet<T> value)
         {
             // add list to elements
+            this->_value.clear();
             for(const T& t : value) {
                 this->element() = qVariantFromValue<T>(t);
             }
@@ -130,9 +167,10 @@ class JsonObject
         }
 
         template<typename K, typename T>
-        JsonObject& operator=(QMap<K, T> value)
+        JsonObject& operator+=(QMap<K, T> value)
         {
             // add map to elements
+            this->_value.clear();
             for(auto itr = value.begin(); itr != value.end(); itr++) {
                 this->element(qVariantFromValue<K>(itr.key()).toString()) = qVariantFromValue<T>(itr.value());
             }
@@ -140,9 +178,10 @@ class JsonObject
         }
 
         template<typename K, typename T>
-        JsonObject& operator=(QHash<K, T> value)
+        JsonObject& operator+=(QHash<K, T> value)
         {
             // add map to elements
+            this->_value.clear();
             for(auto itr = value.begin(); itr != value.end(); itr++) {
                 this->element(qVariantFromValue<K>(itr.key()).toString()) = qVariantFromValue<T>(itr.value());
             }
