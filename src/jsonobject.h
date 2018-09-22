@@ -146,6 +146,17 @@ class JsonObject
             return *this;
         }
 
+        // Element looping (STL Container)
+        inline QMap<QString, JsonObject>::iterator begin() { return this->objects.begin(); }
+        inline QMap<QString, JsonObject>::const_iterator begin() const { return this->objects.begin(); }
+        inline QMap<QString, JsonObject>::const_iterator constBegin() const { return this->objects.constBegin(); }
+        inline QMap<QString, JsonObject>::const_iterator cbegin() const { return this->objects.cbegin(); }
+        inline QMap<QString, JsonObject>::iterator end() { return this->objects.end(); }
+        inline QMap<QString, JsonObject>::const_iterator end() const { return this->objects.end(); }
+        inline QMap<QString, JsonObject>::const_iterator constEnd() const { return this->objects.constEnd(); }
+        inline QMap<QString, JsonObject>::const_iterator cend() const { return this->objects.cend(); }
+        inline QMap<QString, JsonObject>::iterator erase(QMap<QString, JsonObject>::iterator it) { return this->objects.erase(it); }
+
     private:
         // helpers
         QString typeTemplate();
