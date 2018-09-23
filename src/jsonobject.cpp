@@ -74,9 +74,9 @@ QString JsonObject::toJson()
     // handle sub elements
     else {
         for(auto itr = this->objects.begin(); itr != this->objects.end(); itr++) {
-            if(itr != this->objects.begin()) subJson += ", ";
+            if(itr != this->objects.begin()) subJson += ",";
             if(type == Object) {
-                subJson += QString("\"%1\": %2").arg(itr.key(), itr.value().toJson());
+                subJson += QString("\"%1\":%2").arg(itr.key(), itr.value().toJson());
             } else {
                 subJson += itr.value().toJson();
             }
