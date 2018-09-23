@@ -59,30 +59,24 @@ QString JsonObject::toJson()
     // simplify
     Type type = this->type();
 
-    // generate base json
-    QString json = this->typeTemplate();
-    QString subJson;
-
-    // handle null type
-    if(type == Type::Null) return json;
-
-    // handle string type
-    else if(type == Type::String || type == Type::Number) {
-        subJson = this->valueToJson();
+    // generate json for primitive types
+    if(type != Type::Object && type != Type::Array) {
+        return this->valueToJson();
     }
 
-    // handle sub elements
+    // generate json for object/array
     else {
+        QString json;
         for(auto itr = this->objects.begin(); itr != this->objects.end(); itr++) {
-            if(itr != this->objects.begin()) subJson += ",";
+            if(itr != this->objects.begin()) json += ",";
             if(type == Object) {
-                subJson += QString("\"%1\":%2").arg(itr.key(), itr.value().toJson());
+                json += QString("\"%1\":%2").arg(itr.key(), itr.value().toJson());
             } else {
-                subJson += itr.value().toJson();
+                json += itr.value().toJson();
             }
         }
+        return type == Object ? "{" + json + "}" : "[" + json + "]";
     }
-    return json.arg(subJson);
 }
 
 void JsonObject::fromJson(QByteArray json)
@@ -94,6 +88,7 @@ JsonObject::Type JsonObject::type()
 {
     // check value
     if(!this->_value.isNull()) {
+        if(this->_value.type() == QVariant::Bool) return Type::Bool;
         return _value.canConvert<int>() ?
                     Type::Number :
                     Type::String;
@@ -109,24 +104,15 @@ JsonObject::Type JsonObject::type()
     return isArray ? Type::Array : Type::Object;
 }
 
-QString JsonObject::typeTemplate()
-{
-    switch(this->type()) {
-        case Type::Array: return "[%1]";
-        case Type::Object: return "{%1}";
-        case Type::Null: return "null";
-        default : return "%1";
-    }
-}
-
 QString JsonObject::valueToJson()
 {
+    if(_value.isNull()) return "null";
     if(_value.type() == QVariant::String) goto string;
     if(_value.type() == QVariant::Bool) {
-        return QString("%1").arg(_value.toBool() ? "true" : "false");
+        return _value.toBool() ? "true" : "false";
     }
     if(_value.canConvert<int>()) {
-        return QString("%1").arg(_value.toInt());
+        return QString::number(_value.toInt());
     }
     string:
         return QString("\"%1\"").arg(this->_value.toString());

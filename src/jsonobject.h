@@ -22,6 +22,7 @@ class JsonObject
             Array,
             String,
             Number,
+            Bool,
             Null
         };
 
@@ -201,7 +202,6 @@ class JsonObject
 
     private:
         // helpers
-        QString typeTemplate();
         QString valueToJson();
 
         // internal data
