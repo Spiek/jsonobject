@@ -69,6 +69,13 @@ QString JsonObject::toJson()
     return json.arg(subJson);
 }
 
+void JsonObject::fromJson(QByteArray json)
+{
+    JsonParser* parser = new JsonParser(json);
+    *this = parser->parse();
+    delete parser;
+}
+
 JsonObject::Type JsonObject::type()
 {
     // check value

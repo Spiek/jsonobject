@@ -11,6 +11,7 @@
 #include <QHash>
 #include <QStringList>
 
+class JsonParser;
 class JsonObject
 {
     public:
@@ -55,6 +56,7 @@ class JsonObject
 
         // parsing
         QString toJson();
+        void fromJson(QByteArray json);
 
         // internal
         Type type();
@@ -153,6 +155,7 @@ class JsonObject
         QMap<QString, JsonObject> objects;
         JsonObject* parentObject = nullptr;
 };
+#include "jsonparser.h"
 Q_DECLARE_METATYPE(JsonObject)
 
 #endif // JSONOBJECT_H
