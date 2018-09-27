@@ -14,7 +14,6 @@ int main()
 
 
 
-
     // array
     /*main["array"] = QList<QString> {"Element 1", "Element 2", "Element 3"};
     main["array"]() = true;

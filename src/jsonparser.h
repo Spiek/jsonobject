@@ -8,12 +8,15 @@ class JsonParser
 {
     public:
         JsonParser(QByteArray code);
-        JsonObject parse();
+        void parse(JsonObject& object);
 
     private:
-        JsonObject parseObject();
-        JsonObject parseArray();
+        void parseSub(JsonObject& object);
+        void skipUnwanted();
+        void parseObject(JsonObject& object);
+        void parseArray(JsonObject &object);
         QString parseString();
+        int parseNumber();
 
         // code
         QByteArray code;
@@ -22,6 +25,8 @@ class JsonParser
         // json data
         JsonObject data;
         JsonObject* tail = 0;
+
+        char end = '\0';
 };
 
 #endif // JSONPARSER_H

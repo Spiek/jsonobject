@@ -72,7 +72,7 @@ QString JsonObject::toJson()
 void JsonObject::fromJson(QByteArray json)
 {
     JsonParser* parser = new JsonParser(json);
-    *this = parser->parse();
+    parser->parse(*this);
     delete parser;
 }
 
