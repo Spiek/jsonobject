@@ -54,29 +54,41 @@ JsonObject& JsonObject::path(QString path)
     return *walk;
 }
 
-QString JsonObject::toJson()
+QString JsonObject::toJsonImpl(Style style, int layer)
 {
     // simplify
     Type type = this->type();
 
     // generate json for primitive types
     if(type != Type::Object && type != Type::Array) {
-        return this->valueToJson();
+        if(style == Minimal) return this->valueToJson();
+        return this->indentation(this->parent() ? layer : 0) + this->valueToJson();
     }
 
-    // generate json for object/array
-    else {
-        QString json;
-        for(auto itr = this->objects.begin(); itr != this->objects.end(); itr++) {
-            if(itr != this->objects.begin()) json += ",";
-            if(type == Object) {
-                json += QString("\"%1\":%2").arg(itr.key(), itr.value().toJson());
-            } else {
-                json += itr.value().toJson();
-            }
+    // generate json for objects/arrays
+    QString json;
+    for(auto itr = this->objects.begin(); itr != this->objects.end(); itr++) {
+        if(!json.isEmpty()) json += style == Minimal ? "," : ",\n";
+        // handle object
+        if(type == Object) {
+            if(style == Minimal)
+                json += QString("\"%1\":%2").arg(itr.key(), itr.value().toJsonImpl(style, 0));
+            else
+                json += QString("%1\"%2\": %3").arg(this->indentation(layer + 1), itr.key(), itr.value().toJsonImpl(style, layer + 1));
         }
-        return type == Object ? "{" + json + "}" : "[" + json + "]";
+
+        // handle array
+        else if(style == Minimal) {
+            json += itr.value().toJsonImpl(style, 0);
+        } else {
+            json += this->indentation(layer + 1) + itr.value().toJsonImpl(style, layer);
+        }
     }
+
+    // generate container
+    QString border = type == Object ? "{}" : "[]";
+    if(style == Minimal) return border[0] + json + border[1];
+    return QString(border[0] + "\n%1\n%2" + border[1]).arg(json, this->indentation(layer));
 }
 
 void JsonObject::fromJson(QByteArray json)

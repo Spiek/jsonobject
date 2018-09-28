@@ -26,6 +26,13 @@ class JsonObject
             Null
         };
 
+        // Json generation style
+        enum Style : char
+        {
+            Minimal,
+            Pretty
+        };
+
         // construct
         JsonObject(JsonObject *parent = nullptr) : parentObject(parent) {}
         JsonObject(const JsonObject &src)
@@ -58,7 +65,7 @@ class JsonObject
         inline JsonObject& operator[](QString index) { return this->element(index); }
 
         // parsing
-        QString toJson();
+        inline QString toJson(Style style = Minimal) { return this->toJsonImpl(style, 0); }
         void fromJson(QByteArray json);
 
         // internal
@@ -202,6 +209,8 @@ class JsonObject
 
     private:
         // helpers
+        inline QString indentation(int layer) { return QString("    ").repeated(layer); }
+        QString toJsonImpl(Style style, int layer = 0);
         QString valueToJson();
 
         // internal data
