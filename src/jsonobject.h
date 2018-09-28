@@ -46,6 +46,7 @@ class JsonObject
         JsonObject& element(int _index);
         JsonObject& element(QString _index);
         JsonObject& path(QString path);
+        inline int count() { return this->objects.count(); }
 
         // operators
         inline JsonObject& operator()() { return this->element(this->_index); }
@@ -63,7 +64,7 @@ class JsonObject
 
         // data
         inline bool isNull() { return this->type() == Type::Null; }
-        inline QVariant& val() { return this->_value; }
+        inline QVariant& value() { return this->_value; }
         template<typename T>
         T value(bool* success = nullptr)
         {
