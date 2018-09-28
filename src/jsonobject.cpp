@@ -71,9 +71,7 @@ QString JsonObject::toJson()
 
 void JsonObject::fromJson(QByteArray json)
 {
-    JsonParser* parser = new JsonParser(json);
-    parser->parse(*this);
-    delete parser;
+    JsonParser::parse(json, *this);
 }
 
 JsonObject::Type JsonObject::type()
