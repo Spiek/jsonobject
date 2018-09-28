@@ -12,6 +12,7 @@ JsonObject& JsonObject::element()
 
 JsonObject& JsonObject::element(int index)
 {
+    if(index < 0) index = qMax(0, this->_index + index);
     if(index >= this->_index) this->_index = index + 1;
     return this->element(QString::number(index));
 }
