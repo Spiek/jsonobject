@@ -46,6 +46,7 @@ class JsonObject
         JsonObject& element(int _index);
         JsonObject& element(QString _index);
         JsonObject& path(QString path);
+        inline JsonObject& path(QStringList path) { return this->path(path.join((QChar)'\0')); }
         inline int count() { return this->objects.count(); }
 
         // operators

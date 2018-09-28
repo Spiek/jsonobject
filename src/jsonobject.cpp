@@ -27,14 +27,29 @@ JsonObject& JsonObject::element(QString index)
 JsonObject& JsonObject::path(QString path)
 {
     JsonObject* walk = this;
-    for(QString pathElement : path.split(".")) {
+    QString pathElement;
+    for(auto itr = path.begin(); itr != path.end(); itr++) {
+        // if we have not a finish element, just jump to next char
+        bool isEnd = (itr + 1) == path.end();
+        if(isEnd || (*itr != '.' && *itr != '/' && *itr != '\0')) {
+            pathElement += *itr;
+            if(!isEnd) continue;
+        }
+
+        // process empty path element
+        if(pathElement.isEmpty()) {
+            walk = &walk->element();
+            continue;
+        }
+
+        // process path element
         bool isInt;
         int iPathElement = pathElement.toInt(&isInt);
-        if(isInt) {
-            walk = &walk->element(iPathElement);
-        } else {
-            walk = &walk->element(pathElement);
-        }
+        if(isInt) walk = &walk->element(iPathElement);
+        else walk = &walk->element(pathElement);
+
+        // clear path element
+        pathElement.clear();
     }
     return *walk;
 }
