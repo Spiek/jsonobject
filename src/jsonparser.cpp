@@ -63,11 +63,14 @@ QString JsonParser::parseString()
         // handle escape sequences
         if(*itr == '\\') {
             if(++this->itr == this->code.end()) break;
-            if(*itr == 'r') string.append('\r');
+            if(*itr == '"') string.append('"');
+            else if(*itr == '\\') string.append('\\');
             else if(*itr == 'n') string.append('\n');
+            else if(*itr == 'r') string.append('\r');
             else if(*itr == 't') string.append('\t');
-            else if(*itr == '"') string.append('"');
             else if(*itr == '\'') string.append('\'');
+            else if(*itr == 'b') string.append('\b');
+            else if(*itr == 'f') string.append('\f');
             continue;
         }
         if(*itr == '"') break;
