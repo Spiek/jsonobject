@@ -2,63 +2,86 @@
 
 JsonParser::JsonParser(const QByteArray &code) : code(code), itr(code.cbegin()) { }
 
-void JsonParser::parse(const QByteArray &code, JsonObject& object)
+JsonParseResult JsonParser::parse(const QByteArray &code, JsonObject& object)
 {
-    JsonParser(code).parseSub(object);
+    JsonParser parser(code);
+    parser.parseSub(object);
+    return parser.result;
 }
 
-void JsonParser::parseSub(JsonObject &object)
+bool JsonParser::parseSub(JsonObject &object)
 {
     this->skipUnwanted();
 
     // parse object
-    if(this->nextChars("[", false)) this->parseArray(object);
-    else if(this->nextChars("{", false)) this->parseObject(object);
-    else if(this->nextChars("\"", false, false)) object = this->parseString();
+    if(this->nextChars("[", false, false)) this->parseArray(object);
+    else if(this->nextChars("{", false, false)) this->parseObject(object);
+    else if(this->nextChars("\"", false, false, false)) object = this->parseString();
     else if(*itr >= 48 && *itr <= 57) object = this->parseNumber();
-    else if(this->nextChars("true", false)) object = true;
-    else if(this->nextChars("false", false)) object = false;
-    else if(this->nextChars("null", false)) {}
+    else if(this->nextChars("true", false, false)) object = true;
+    else if(this->nextChars("false", false, false)) object = false;
+    else if(this->nextChars("null", false, false)) {}
+    else this->handleError("[,{,\",true,false,null or a number");
+
+    // exit on error
+    if(!this->result) return false;
 
     this->skipUnwanted();
+    return true;
 }
 
-bool JsonParser::nextChars(const char *data, bool skipUnwanted, bool remove)
+bool JsonParser::nextChars(const char *data, bool error, bool skipUnwanted, bool remove)
 {
+    if(!this->result) return false;
     if(skipUnwanted) this->skipUnwanted();
     size_t len = strlen(data);
     size_t i = 0;
     for(; i < len && (this->itr + i) != this->code.end() && *(this->itr + i) == *(data + i); i++);
-    if(i != len) return false;
-    if(remove) this->itr += len;
+    if(i != len) {
+        if(error) this->handleError((data + i), i);
+        return false;
+    }
+	if(remove) this->itr += len;
     if(skipUnwanted) this->skipUnwanted();
     return true;
 }
 
+void JsonParser::handleError(QString expected, size_t offset, QString type)
+{
+    this->result.offset = this->itr - this->code.cbegin() + static_cast<int>(offset);
+    this->result.expected = expected;
+    this->result.type = type;
+    this->result.parsed = QByteArray(this->code.cbegin(),
+                                        (this->itr == this->code.cend() ? this->itr : this->itr + 1) - this->code.cbegin());
+    this->result.unexpexted = *(this->itr + offset);
+}
+
 void JsonParser::parseArray(JsonObject& object)
 {
-    for(;this->itr != this->code.end(); itr++) {
-        this->parseSub(object());
+    while(true) {
+        if(!this->parseSub(object())) return;
         if(*itr == ']') break;
+        if(!this->nextChars(",", true)) return;
     };
-    this->nextChars("]");
+    this->nextChars("]", true);
 }
 
 void JsonParser::parseObject(JsonObject& object)
 {
-    for(;this->itr != this->code.end(); itr++) {
+    while(true) {
         JsonObject& obj = object(this->parseString());
-        this->nextChars(":");
-        this->parseSub(obj);
+        if(!this->nextChars(":", true)) return;
+        if(!this->parseSub(obj)) return;
         if(*itr == '}') break;
+        if(!this->nextChars(",", true)) return;
     };
-    this->nextChars("}");
+    this->nextChars("}", true);
 }
 
 QString JsonParser::parseString()
 {
     QString string = "";
-    this->nextChars("\"");
+    if(!this->nextChars("\"", true)) return string;
     for(;this->itr != this->code.end(); itr++) {
         // handle escape sequences
         if(*itr == '\\') {
@@ -71,12 +94,22 @@ QString JsonParser::parseString()
             else if(*itr == '\'') string.append('\'');
             else if(*itr == 'b') string.append('\b');
             else if(*itr == 'f') string.append('\f');
+            else {
+                this->handleError("\",\\,n,r,t,',b,f", 0, "escape sequence");
+                return "";
+            }
             continue;
         }
         if(*itr == '"') break;
         string.append(*itr);
+
+        // if we reach end of string but are not finish, raise error
+        if(this->itr == this->code.cend() - 1) {
+            this->handleError("\"", 0, "end of file");
+            return "";
+        }
     }
-    this->nextChars("\"");
+    if(!this->nextChars("\"", true)) return "";
     return string;
 }
 

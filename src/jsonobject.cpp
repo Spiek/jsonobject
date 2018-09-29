@@ -91,9 +91,9 @@ QString JsonObject::toJsonImpl(Style style, int layer)
     return QString(border[0] + "\n%1\n%2" + border[1]).arg(json, this->indentation(layer));
 }
 
-void JsonObject::fromJson(QByteArray json)
+JsonParseResult JsonObject::fromJson(const QByteArray &json)
 {
-    JsonParser::parse(json, *this);
+    return JsonParser::parse(json, *this);
 }
 
 JsonObject::Type JsonObject::type()

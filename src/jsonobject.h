@@ -12,6 +12,7 @@
 #include <QStringList>
 
 class JsonParser;
+class JsonParseResult;
 class JsonObject
 {
     public:
@@ -66,7 +67,7 @@ class JsonObject
 
         // parsing
         inline QString toJson(Style style = Minimal) { return this->toJsonImpl(style, 0); }
-        void fromJson(QByteArray json);
+        JsonParseResult fromJson(const QByteArray &json);
 
         // internal
         Type type();
