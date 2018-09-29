@@ -26,8 +26,8 @@ void JsonParser::parseSub(JsonObject &object)
 bool JsonParser::nextChars(const char *data, bool skipUnwanted, bool remove)
 {
     if(skipUnwanted) this->skipUnwanted();
-    int len = strlen(data);
-    int i = 0;
+    size_t len = strlen(data);
+    size_t i = 0;
     for(; i < len && (this->itr + i) != this->code.end() && *(this->itr + i) == *(data + i); i++);
     if(i != len) return false;
     if(remove) this->itr += len;
