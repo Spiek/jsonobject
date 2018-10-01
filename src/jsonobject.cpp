@@ -81,7 +81,7 @@ QString JsonObject::toJsonImpl(Style style, int layer)
         else if(style == Minimal) {
             json += itr.value().toJsonImpl(style, 0);
         } else {
-            json += this->indentation(layer + 1) + itr.value().toJsonImpl(style, layer);
+            json += this->indentation(layer + 1) + itr.value().toJsonImpl(style, layer + 1);
         }
     }
 
