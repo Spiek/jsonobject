@@ -57,15 +57,64 @@ int main()
 }
 ```
 
-This example produces the following result:
+This example produces the following output:
 ```
 this.is.my.path = 12
+Print Output of Main JsonObject:
+{
+    "array": [
+        "Element 1",
+        "Element 2",
+        "Element 3",
+        true
+    ],
+    "integer": 12,
+    "null": null,
+    "object": {
+        "Key 1": "Value 1",
+        "Key 2": "Value 2",
+        "key": "value"
+    },
+    "string": "My String",
+    "this": {
+        "is": {
+            "my": {
+                "path": [
+                    12
+                ]
+            }
+        }
+    }
+}
 
-Print Result of Main JsonObject:
-{"array": ["Element 1", "Element 2", "Element 3", true], "integer": 12, "null": null, "object": {"Key 1": "Value 1", "Key 2": "Value 2", "key": "value"}, "string": "My String", "this": {"is": {"my": {"path": [12]}}}}
-
-Print Result of Second JsonObject:
-{"Second": {"array": ["Element 1", "Element 2", "Element 3", true], "integer": 12, "null": null, "object": {"Key 1": "Value 1", "Key 2": "Value 2", "key": "value"}, "string": "My String", "this": {"is": {"my": {"path": [12]}}}}}
+Print Output of Second JsonObject:
+{
+    "Second": {
+        "array": [
+            "Element 1",
+            "Element 2",
+            "Element 3",
+            true
+        ],
+        "integer": 12,
+        "null": null,
+        "object": {
+            "Key 1": "Value 1",
+            "Key 2": "Value 2",
+            "key": "value"
+        },
+        "string": "My String",
+        "this": {
+            "is": {
+                "my": {
+                    "path": [
+                        12
+                    ]
+                }
+            }
+        }
+    }
+}
 ```
 
 ### Compile Staticly:  
