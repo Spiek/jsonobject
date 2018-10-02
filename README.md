@@ -6,7 +6,7 @@ A very easy to use Qt library for Writing and Reading Json Data.
 
 ### Example
 
-Here is an [example](https://github.com/Spiek/jsonobject/blob/master/src/main.cpp) which should explain the basic use cases:
+Here is an [example](https://github.com/Spiek/jsonobject/blob/master/example/general/main.cpp) which should explain the basic use cases:
 
 ```c++
 #include <QList>
@@ -120,7 +120,7 @@ Print Output of Second JsonObject:
 ### Compile Staticly:  
 Just add the following to your Qt-Project file:
 ```qmake
-include(Jsonobject.pri)
+include(jsonobject.pri)
 ```
 **Include project syntax:**  
 #include "jsonobject.h"
@@ -130,7 +130,7 @@ include(Jsonobject.pri)
 ### Compile Dynamicly:   
 Note: The **make install** installation pathes, are printed to you during qmake!
 ```
-qmake Jsonobject
+qmake jsonobject
 make
 make install
 ```
