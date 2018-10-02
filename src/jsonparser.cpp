@@ -30,6 +30,42 @@ bool JsonParser::parseSub(JsonObject &object)
     return true;
 }
 
+void JsonParser::skipUnwanted()
+{
+    for(; this->itr != this->code.end(); this->itr++) {
+        if(*itr <= 32) continue;
+
+        // handle comments
+        if(*itr == '/') {
+            if((this->itr + 1) == this->code.cend()) continue;
+
+            // ignore single line comment (from: // to line end)
+            if(*(itr + 1) == '/') {
+                this->itr += 2;
+                for(;;this->itr++) {
+                    if((this->itr + 1) == this->code.end()) break;
+                    if(*itr == 10) break;
+                }
+                continue;
+            }
+
+            // ignore multi line comment (from: /* to */)
+            if(*(itr + 1) == '*') {
+                this->itr += 2;
+                for(; this->itr != this->code.end(); this->itr++) {
+                    if((this->itr + 1) == this->code.end()) break;
+                    if(*itr == '*' && *(itr + 1) == '/') {
+                        this->itr++;
+                        break;
+                    }
+                }
+                continue;
+            }
+        }
+        break;
+    }
+}
+
 bool JsonParser::nextChars(const char *data, bool error, bool skipUnwanted, bool remove)
 {
     if(!this->result) return false;

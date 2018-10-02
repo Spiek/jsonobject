@@ -40,7 +40,7 @@ class JsonParser
         int parseNumber();
 
         // helpers
-        inline void skipUnwanted() { for(; this->itr != this->code.end() && *itr <= 32; this->itr++); }
+        inline void skipUnwanted();
         bool nextChars(const char* data, bool error, bool skipUnwanted = true, bool remove = true);
         void handleError(QString expected = QString(), size_t offset = 0, QString type = "char");
 
