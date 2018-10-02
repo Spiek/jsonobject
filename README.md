@@ -9,9 +9,6 @@ A very easy to use Qt library for Writing and Reading Json Data.
 Here is an [example](https://github.com/Spiek/jsonobject/blob/master/example/general/main.cpp) which should explain the basic use cases:
 
 ```c++
-#include <QList>
-#include <QMap>
-#include <QString>
 #include "jsonobject.h"
 
 int main()
@@ -36,10 +33,10 @@ int main()
     main["null"];
 
     // set via path
-    main.path("this.is.my.path.0") = 12;
+    *main.path("this.is.my.path.0") = 12;
 
     // access value
-    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path.0").integer());
+    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path.0")->integer());
 	
     // copy to other object
     JsonObject second;
@@ -48,9 +45,9 @@ int main()
     // just print results
     for(int i = 0; i < 2; i++)
     {
-        printf("Print Result of %s JsonObject:\n%s\n\n",
+        printf("Print Output of %s JsonObject:\n%s\n\n",
                     !i ? "Main" : "Second",
-                    qPrintable((!i ? main : second).toJson()));
+                    qPrintable((!i ? main : second).toJson(JsonObject::Pretty)));
     }
 
     return 0;

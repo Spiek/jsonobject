@@ -24,34 +24,40 @@ JsonObject& JsonObject::element(QString index)
                     this->objects.insert(index, JsonObject(this)).value();
 }
 
-JsonObject& JsonObject::path(QString path)
+JsonObject* JsonObject::path(QString path, bool createPath)
 {
     JsonObject* walk = this;
     QString pathElement;
     for(auto itr = path.begin(); itr != path.end(); itr++) {
         // if we have not a finish element, just jump to next char
         bool isEnd = (itr + 1) == path.end();
-        if(isEnd || (*itr != '.' && *itr != '/' && *itr != '\0')) {
-            pathElement += *itr;
+        bool isDelimiter = *itr == '.' || *itr == '/' || *itr == '\0';
+        if(isEnd || !isDelimiter) {
+            if(!isDelimiter) pathElement += *itr;
             if(!isEnd) continue;
         }
 
         // process empty path element
         if(pathElement.isEmpty()) {
-            walk = &walk->element();
+            if(createPath) walk = &walk->element();
             continue;
         }
 
         // process path element
         bool isInt;
         int iPathElement = pathElement.toInt(&isInt);
-        if(isInt) walk = &walk->element(iPathElement);
-        else walk = &walk->element(pathElement);
+        if(isInt) {
+            if(!createPath && !walk->contains(iPathElement)) return nullptr;
+            walk = &walk->element(iPathElement);
+        } else {
+            if(!createPath && !walk->contains(pathElement)) return nullptr;
+            walk = &walk->element(pathElement);
+        }
 
         // clear path element
         pathElement.clear();
     }
-    return *walk;
+    return walk;
 }
 
 QString JsonObject::toJsonImpl(Style style, int layer)

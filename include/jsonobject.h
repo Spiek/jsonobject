@@ -54,8 +54,8 @@ class JsonObject
         JsonObject& element();
         JsonObject& element(int index);
         JsonObject& element(QString index);
-        JsonObject& path(QString path);
-        inline JsonObject& path(QStringList path) { return this->path(path.join(static_cast<QChar>('\0'))); }
+        JsonObject* path(QString path, bool createPath = true);
+        inline JsonObject* path(QStringList path, bool createPath = true) { return this->path(path.join(static_cast<QChar>('\0')), createPath); }
         inline int count() { return this->objects.count(); }
 
         // element remove functions
@@ -63,6 +63,11 @@ class JsonObject
         inline bool remove(QString index) { return this->objects.remove(index) == 1; }
         inline JsonObject& removed(int index) { this->remove(index); return *this; }
         inline JsonObject& removed(QString index) { this->remove(index); return *this; }
+
+        // element contains functions
+        inline bool contains(int index) { return this->contains(QString::number(index)); }
+        inline bool contains(QString index) { return this->objects.contains(index); }
+        inline bool containsPath(QString path) { return this->path(path, false); }
 
         // operators
         inline JsonObject& operator()() { return this->element(this->_index); }

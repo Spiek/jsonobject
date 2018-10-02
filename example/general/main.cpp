@@ -22,10 +22,10 @@ int main()
     main["null"];
 
     // set via path
-    main.path("this.is.my.path.0") = 12;
+    *main.path("this.is.my.path.0") = 12;
 
     // access value
-    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path.0").integer());
+    qDebug("this.is.my.path = %d\n", main.path("this.is.my.path.0")->integer());
 
     // copy to other object
     JsonObject second;
