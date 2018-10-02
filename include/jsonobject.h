@@ -41,6 +41,7 @@ class JsonObject
             this->_index = src._index;
             this->_value = src._value;
             this->objects = src.objects;
+            this->parentObject = src.parentObject;
         }
         JsonObject(JsonObject&& move)
         {
@@ -48,15 +49,16 @@ class JsonObject
             this->_value = std::move(move._value);
             this->objects = std::move(move.objects);
         }
+        virtual ~JsonObject() {}
 
         // element accsss function
-        JsonObject* parent();
         JsonObject& element();
         JsonObject& element(int index);
         JsonObject& element(QString index);
         JsonObject* path(QString path, bool createPath = true);
         inline JsonObject* path(QStringList path, bool createPath = true) { return this->path(path.join(static_cast<QChar>('\0')), createPath); }
         inline int count() { return this->objects.count(); }
+        inline JsonObject* parent() { return this->parentObject; }
 
         // element remove functions
         inline bool remove(int index) { return this->remove(QString::number(index)); }

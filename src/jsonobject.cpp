@@ -1,10 +1,5 @@
 #include "jsonobject.h"
 
-JsonObject* JsonObject::parent()
-{
-    return this->parentObject;
-}
-
 JsonObject& JsonObject::element()
 {
     return this->element(this->_index);
