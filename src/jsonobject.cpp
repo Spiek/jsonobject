@@ -75,14 +75,14 @@ QString JsonObject::toJsonImpl(Style style, int layer)
             if(style == Minimal)
                 json += QString("\"%1\":%2").arg(itr.key(), itr.value().toJsonImpl(style, 0));
             else
-                json += QString("%1\"%2\": %3").arg(this->indentation(layer + 1), itr.key(), itr.value().toJsonImpl(style, layer + 1));
+                json += QString("%1\"%2\": %3").arg(this->indentation(layer + 1), itr.key(), itr.value().toJsonImpl(style, itr.value().isSimpleType() ? 0 : layer + 1));
         }
 
         // handle array
         else if(style == Minimal) {
             json += itr.value().toJsonImpl(style, 0);
         } else {
-            json += this->indentation(layer + 1) + itr.value().toJsonImpl(style, layer + 1);
+            json += this->indentation(layer + 1) + itr.value().toJsonImpl(style, itr.value().isSimpleType() ? 0 : layer + 1);
         }
     }
 
