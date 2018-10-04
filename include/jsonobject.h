@@ -167,6 +167,21 @@ class JsonObject
         /// operator+= Templates
         ///
         template<typename T>
+        JsonObject& operator+=(const T& value)
+        {
+            // exit if we cannot convert
+            if(!this->_value.isNull() && !this->_value.canConvert<T>()) return *this;
+            this->_value = qVariantFromValue<T>(this->value<T>() + value);
+            return *this;
+        }
+        JsonObject& operator+=(const char* value)
+        {
+            // exit if we cannot convert
+            if(!this->_value.isNull() && !this->_value.canConvert<QString>()) return *this;
+            this->_value = qVariantFromValue<QString>(this->value<QString>() + value);
+            return *this;
+        }
+        template<typename T>
         JsonObject& operator+=(QList<T> value)
         {
             // add list to elements
@@ -209,6 +224,49 @@ class JsonObject
             }
             return *this;
         }
+
+
+        ///
+        /// additional operators Templates
+        ///
+        template<typename T>
+        JsonObject& operator-=(const T& value)
+        {
+            // only support arithmetic types
+            static_assert(std::is_arithmetic<T>::value,
+                          "JsonObject -= Operation are only supported for arithmetic types!");
+
+            // exit if we cannot convert
+            if(!this->_value.isNull() && !this->_value.canConvert<T>()) return *this;
+            this->_value = qVariantFromValue<T>(this->value<T>() - value);
+            return *this;
+        }
+        template<typename T>
+        JsonObject& operator*=(const T& value)
+        {
+            // only support arithmetic types
+            static_assert(std::is_arithmetic<T>::value,
+                          "JsonObject *= Operation are only supported for arithmetic types!");
+
+            // exit if we cannot convert
+            if(!this->_value.isNull() && !this->_value.canConvert<T>()) return *this;
+            this->_value = qVariantFromValue<T>(this->value<T>() * value);
+            return *this;
+        }
+        template<typename T>
+        JsonObject& operator/=(const T& value)
+        {
+            // only support arithmetic types
+            static_assert(std::is_arithmetic<T>::value,
+                          "JsonObject /= Operation are only supported for arithmetic types!");
+
+            // exit if we cannot convert
+            if(!this->_value.isNull() && !this->_value.canConvert<T>()) return *this;
+            this->_value = qVariantFromValue<T>(this->value<T>() / value);
+            return *this;
+        }
+
+
 
         // Element looping (STL Container)
         inline QMap<QString, JsonObject>::iterator begin() { return this->objects.begin(); }
