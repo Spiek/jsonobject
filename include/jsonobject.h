@@ -86,6 +86,12 @@ class JsonObject
         Type type();
 
         // data
+        inline bool isArray() { return this->type() == Type::Array; }
+        inline bool isObject() { return this->type() == Type::Object; }
+        inline bool isSimpleType() { return !this->isArray() && !this->isObject(); }
+        inline bool isNumber() { return this->type() == Type::Number; }
+        inline bool isString() { return this->type() == Type::String; }
+        inline bool isBoolean() { return this->type() == Type::Bool; }
         inline bool isNull() { return this->type() == Type::Null; }
         inline QVariant& value() { return this->_value; }
         template<typename T>
@@ -265,8 +271,6 @@ class JsonObject
             this->_value = qVariantFromValue<T>(this->value<T>() / value);
             return *this;
         }
-
-
 
         // Element looping (STL Container)
         inline QMap<QString, JsonObject>::iterator begin() { return this->objects.begin(); }
