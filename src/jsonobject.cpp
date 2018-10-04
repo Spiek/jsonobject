@@ -19,11 +19,11 @@ JsonObject& JsonObject::element(QString index)
                     this->objects.insert(index, JsonObject(this)).value();
 }
 
-JsonObject* JsonObject::path(QString path, bool createPath)
+JsonObject* JsonObject::pathImpl(QString path, bool createPath, bool reverse)
 {
     JsonObject* walk = this;
     QString pathElement;
-    for(auto itr = path.begin(); itr != path.end(); itr++) {
+    for(auto itr = path.begin(); walk && itr != path.end(); itr++) {
         // if we have not a finish element, just jump to next char
         bool isEnd = (itr + 1) == path.end();
         bool isDelimiter = *itr == '.' || *itr == '/' || *itr == '\0';
@@ -34,7 +34,11 @@ JsonObject* JsonObject::path(QString path, bool createPath)
 
         // process empty path element
         if(pathElement.isEmpty()) {
-            if(createPath) walk = &walk->element();
+            if(reverse) {
+                if(!walk->parent() && createPath) walk->parentObject = new JsonObject;
+                walk = walk->parent();
+            }
+            else if(createPath) walk = &walk->element();
             continue;
         }
 
@@ -42,11 +46,21 @@ JsonObject* JsonObject::path(QString path, bool createPath)
         bool isInt;
         int iPathElement = pathElement.toInt(&isInt);
         if(isInt) {
-            if(!createPath && !walk->contains(iPathElement)) return nullptr;
-            walk = &walk->element(iPathElement);
+            if(reverse) {
+                if(!walk->parent() && createPath) walk->parentObject = new JsonObject;
+                if(!walk->parent()) return nullptr;
+                if(walk->parent()->contains(iPathElement) || createPath) walk = &walk->parent()->element(iPathElement);
+            }
+            else if(!createPath && !walk->contains(iPathElement)) return nullptr;
+            else walk = &walk->element(iPathElement);
         } else {
-            if(!createPath && !walk->contains(pathElement)) return nullptr;
-            walk = &walk->element(pathElement);
+            if(reverse) {
+                if(!walk->parent() && createPath) walk->parentObject = new JsonObject;
+                if(!walk->parent()) return nullptr;
+                if(walk->parent()->contains(pathElement) || createPath) walk = &walk->parent()->element(pathElement);
+            }
+            else if(!createPath && !walk->contains(pathElement)) return nullptr;
+            else walk = &walk->element(pathElement);
         }
 
         // clear path element
@@ -99,6 +113,14 @@ JsonParseResult JsonObject::fromJson(const QByteArray &json)
 
 JsonObject::Type JsonObject::type()
 {
+    // check sub value type
+    if(!this->objects.isEmpty()) {
+        bool isArray;
+        int lastIndex = this->objects.lastKey().toInt(&isArray);
+        isArray = isArray && this->objects.count() - 1 == lastIndex;
+        return isArray ? Type::Array : Type::Object;
+    }
+
     // check value
     if(!this->_value.isNull()) {
         if(this->_value.type() == QVariant::Bool) return Type::Bool;
@@ -107,14 +129,8 @@ JsonObject::Type JsonObject::type()
                     Type::String;
     }
 
-    // if we have no value set in object, we have an null type
-    if(this->objects.isEmpty()) return Type::Null;
-
-    // check sub value type
-    bool isArray;
-    int lastIndex = this->objects.lastKey().toInt(&isArray);
-    isArray = isArray && this->objects.count() - 1 == lastIndex;
-    return isArray ? Type::Array : Type::Object;
+    // here we have a null type
+    return Type::Null;
 }
 
 QString JsonObject::valueToJson()

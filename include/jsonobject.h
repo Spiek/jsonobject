@@ -51,12 +51,18 @@ class JsonObject
         }
         virtual ~JsonObject() {}
 
-        // element accsss function
+        // element accsss functions
         JsonObject& element();
         JsonObject& element(int index);
         JsonObject& element(QString index);
-        JsonObject* path(QString path, bool createPath = true);
-        inline JsonObject* path(QStringList path, bool createPath = true) { return this->path(path.join(static_cast<QChar>('\0')), createPath); }
+
+		// path access functions
+        inline JsonObject* path(QString path, bool createPath = true) { return this->pathImpl(path, createPath, false); }
+        inline JsonObject* path(QStringList path, bool createPath = true) { return this->pathImpl(path.join(static_cast<QChar>('\0')), createPath, false); }
+        inline JsonObject* rpath(QString path, bool createPath = true) { return this->pathImpl(path, createPath, true); }
+        inline JsonObject* rpath(QStringList path, bool createPath = true) { return this->pathImpl(path.join(static_cast<QChar>('\0')), createPath, true); }
+		
+		// general data
         inline int count() { return this->objects.count(); }
         inline JsonObject* parent() { return this->parentObject; }
 
@@ -288,6 +294,7 @@ class JsonObject
         inline QString indentation(int layer) { return QString("    ").repeated(layer); }
         QString toJsonImpl(Style style, int layer = 0);
         QString valueToJson();
+        JsonObject* pathImpl(QString path, bool createPath, bool reverse);
 
         // internal data
         int _index = 0;
