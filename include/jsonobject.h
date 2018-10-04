@@ -61,11 +61,15 @@ class JsonObject
         inline JsonObject& path(QStringList path) { return *this->pathImpl(path.join(static_cast<QChar>('\0')), true, false); }
         inline JsonObject* pathPtr(QString path, bool createPath = true) { return this->pathImpl(path, createPath, false); }
         inline JsonObject* pathPtr(QStringList path, bool createPath = true) { return this->pathImpl(path.join(static_cast<QChar>('\0')), createPath, false); }
+        inline bool containsPath(QString path) { return this->pathPtr(path, false); }
+
+        // reverse path access functions
         inline JsonObject& rpath(QString path) { return *this->pathImpl(path, true, true); }
         inline JsonObject& rpath(QStringList path) { return *this->pathImpl(path.join(static_cast<QChar>('\0')), true, true); }
         inline JsonObject* rpathPtr(QString path, bool createPath = true) { return this->pathImpl(path, createPath, true); }
         inline JsonObject* rpathPtr(QStringList path, bool createPath = true) { return this->pathImpl(path.join(static_cast<QChar>('\0')), createPath, true); }
-		
+        inline bool containsRPath(QString path) { return this->rpathPtr(path, false); }
+
 		// general data
         inline int count() { return this->objects.count(); }
         inline JsonObject* parent() { return this->parentObject; }
@@ -79,7 +83,6 @@ class JsonObject
         // element contains functions
         inline bool contains(int index) { return this->contains(QString::number(index)); }
         inline bool contains(QString index) { return this->objects.contains(index); }
-        inline bool containsPath(QString path) { return this->pathPtr(path, false); }
 
         // operators
         inline JsonObject& operator()() { return this->element(this->_index); }
